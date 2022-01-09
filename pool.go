@@ -11,8 +11,13 @@ type gzPool struct {
 	compressionType CompressionType
 }
 
-func newGzPool(compressionType CompressionType) gzPool {
-	return gzPool{compressionType: compressionType}
+type Pool interface {
+	Get() *gzip.Writer
+	Put(w *gzip.Writer)
+}
+
+func newGzPool(compressionType CompressionType) Pool {
+	return &gzPool{compressionType: compressionType}
 }
 
 func (p *gzPool) Get() *gzip.Writer {

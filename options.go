@@ -37,7 +37,7 @@ type Options struct {
 	excludedPathesRegexs excludedPathesRegexs
 	decompressFn         DecompressFn
 	compressionType      CompressionType
-	pool                 gzPool
+	pool                 Pool
 }
 
 type Option func(*Options)
@@ -69,6 +69,12 @@ func WithDecompressFn(decompressFn DecompressFn) Option {
 func WithCompressionType(compressionType CompressionType) Option {
 	return func(o *Options) {
 		o.compressionType = compressionType
+	}
+}
+
+func WithPool(pool Pool) Option {
+	return func(o *Options) {
+		o.pool = pool
 	}
 }
 
@@ -138,11 +144,9 @@ func defaultDecompressHandle(c *gin.Context) {
 
 func newOptions(opts ...Option) *Options {
 	options := defaultOptions
+	options.pool = newGzPool(options.compressionType)
 	for _, setter := range opts {
 		setter(options)
 	}
-
-	options.pool = newGzPool(options.compressionType)
-
 	return options
 }
